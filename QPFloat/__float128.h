@@ -268,11 +268,11 @@ public:
 	}
 	static __float128 Log(__float128 &v, __float128 &base);
 	static __float128 Log2(__float128 &v);
-	static void Cieling( __float128 &v, __float128 &result );
-	static inline __float128 Cieling(__float128 &v)
+	static void Ceiling( __float128 &v, __float128 &result );
+	static inline __float128 Ceiling(__float128 &v)
 	{
 		__float128 result;
-		Cieling(v, result);
+		Ceiling(v, result);
 		return result;
 	}
 	static void Floor( __float128 &v, __float128 &result );

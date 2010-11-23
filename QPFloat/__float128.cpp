@@ -1018,7 +1018,7 @@ void __float128::Fraction( __float128 &v, __float128 &result )
 	}
 }
 
-void __float128::Cieling( __float128 &v, __float128 &result )
+void __float128::Ceiling( __float128 &v, __float128 &result )
 {
 	int unbiasedExponent = v.GetBase2Exponent();
 	if (unbiasedExponent == QUAD_EXPONENT_MAX) result = v; //NaN, +inf, -inf

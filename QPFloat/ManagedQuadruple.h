@@ -329,11 +329,11 @@ namespace System
 		}
 		static Quadruple Log(Quadruple v, Quadruple base);
 		static Quadruple Log2(Quadruple v);
-		static void Cieling( Quadruple %v, [Out] Quadruple %result );
-		static inline Quadruple Cieling(Quadruple v)
+		static void Ceiling( Quadruple %v, [Out] Quadruple %result );
+		static inline Quadruple Ceiling(Quadruple v)
 		{
 			Quadruple result;
-			Cieling(v, result);
+			Ceiling(v, result);
 			return result;
 		}
 		static void Floor( Quadruple %v, [Out] Quadruple %result );

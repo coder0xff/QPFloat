@@ -230,11 +230,11 @@ namespace System
 		return *(Quadruple*)&result;
 	}
 
-	void Quadruple::Cieling( Quadruple %v, Quadruple %result )
+	void Quadruple::Ceiling( Quadruple %v, Quadruple %result )
 	{
 		pin_ptr<byte> vPtr = v.storage;
 		pin_ptr<byte> resultPtr = result.storage;
-		__float128::Cieling(*(__float128*)vPtr, *(__float128*)resultPtr);
+		__float128::Ceiling(*(__float128*)vPtr, *(__float128*)resultPtr);
 	}
 
 	void Quadruple::Floor( Quadruple %v, Quadruple %result )
