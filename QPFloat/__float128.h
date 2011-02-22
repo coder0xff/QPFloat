@@ -43,23 +43,7 @@ FPU_EXCEPTION_DECLARATION(Inexact);
 
 struct __float128;
 #define QUAD_CONSTANT(name, dataSource) extern __float128 Quad##name ;
-QUAD_CONSTANT(NaN, snan);
-QUAD_CONSTANT(Indefinite, ind);
-QUAD_CONSTANT(PositiveInfinity, posInf);
-QUAD_CONSTANT(NegativeInfinity, negInf);
-QUAD_CONSTANT(E, e);
-QUAD_CONSTANT(Log2E, log2e);
-QUAD_CONSTANT(Ln2, ln2);
-QUAD_CONSTANT(TwoPi, twoPi);
-QUAD_CONSTANT(Pi, pi);
-QUAD_CONSTANT(HalfPi, halfPi);
-QUAD_CONSTANT(QuarterPi, quarterPi);
-QUAD_CONSTANT(Zero, zero);
-QUAD_CONSTANT(NegZero, negZero);
-QUAD_CONSTANT(One, one);
-QUAD_CONSTANT(NegOne, negOne);
-QUAD_CONSTANT(Half, half);
-QUAD_CONSTANT(SinQuarterPi, sinQuarterPi);
+#include "constants.h"
 #undef QUAD_CONSTANT
 
 struct __float128
@@ -78,7 +62,23 @@ private:
 		return *((ui16*)this + 7) & QUAD_EXPONENT_MASK;
 	}
 	static void ReadOutResult(ui32 *buffer, int headScanBackStart, int biasedExponentAtScanStart, bool sign, __float128 &result);
+	//the partial functions implement the Taylor series for the function
+	//they are slow on large values, because they have no optimizations
+	//but they are needed by the optimized functions - Ln, and Exp
 	static __float128 PartialLn(__float128 &v);
+	static __float128 PartialExp(__float128 &v);
+	static __float128 Factorial(i32 v)
+	{
+		if (v < 0) return QuadNaN;
+		if (v > MAX_FACTORIAL) return QuadPositiveInfinity;
+		return factorials[v];
+	}	
+	static __float128 FactorialReciprocal(i32 v)
+	{
+		if (v < 0) return QuadNaN;
+		if (v > MAX_FACTORIAL) return QuadPositiveInfinity;
+		return factorialReciprocals[v];
+	}
 public:
 	__float128();
 	static inline __float128& FromData(byte *data)
@@ -261,6 +261,8 @@ public:
 	}
 	static __float128 Ln(__float128 &v);
 	static __float128 Exp(__float128 &v);
+	static __float128 Base2Exp(i32 v);
+	static __float128 Base2Exp(__float128 &v);
 	static __float128 Pow(__float128 &base, __float128 &exponent);
 	__float128 inline operator^(__float128 &b)
 	{
@@ -307,11 +309,14 @@ public:
 	}
 	static __float128 Sin(__float128 &v);
 	static __float128 Cos(__float128 &v);
+	static void SinCos(__float128 &v, __float128 &resultSin, __float128 &resultCos);
 	static __float128 Tan(__float128 &v);
 	static __float128 ASin(__float128 &v);
 	static __float128 ACos(__float128 &v);
 	static __float128 ATan(__float128 &v);
 	static __float128 ATan2(__float128 &y, __float128 &x);
+private:
+	//static __float128 Factorial(__float128 &v);
 };
 
 #pragma warning(disable: 4949)

@@ -312,6 +312,8 @@ namespace System
 		static explicit operator i64 (Quadruple v);
 		static operator Quadruple( i32 v );
 		static explicit operator i32 (Quadruple v);
+		static explicit operator __float128 (Quadruple v);
+		static explicit operator Quadruple (__float128 v);
 
 		static void Abs(Quadruple %v, [Out] Quadruple %result);
 		static inline Quadruple Abs(Quadruple v)
@@ -321,6 +323,7 @@ namespace System
 			return result;
 		}
 		static Quadruple Ln(Quadruple v);
+		static Quadruple Base2Exp(Quadruple v);
 		static Quadruple Exp(Quadruple v);
 		static Quadruple Pow(Quadruple base, Quadruple exponent);
 		static Quadruple inline operator^(Quadruple a, Quadruple b)
@@ -375,23 +378,7 @@ namespace System
 		virtual String^ ToString() override;
 		static Quadruple FromString(String^ s);
 
-		QUAD_CONSTANT(NaN, snan);
-		QUAD_CONSTANT(Indefinite, ind);
-		QUAD_CONSTANT(PositiveInfinity, posInf);
-		QUAD_CONSTANT(NegativeInfinity, negInf);
-		QUAD_CONSTANT(E, e);
-		QUAD_CONSTANT(Log2E, log2e);
-		QUAD_CONSTANT(Ln2, ln2);
-		QUAD_CONSTANT(TwoPi, twoPi);
-		QUAD_CONSTANT(Pi, pi);
-		QUAD_CONSTANT(HalfPi, halfPi);
-		QUAD_CONSTANT(QuarterPi, quarterPi);
-		QUAD_CONSTANT(Zero, zero);
-		QUAD_CONSTANT(NegZero, negZero);
-		QUAD_CONSTANT(One, one);
-		QUAD_CONSTANT(NegOne, negOne);
-		QUAD_CONSTANT(Half, half);
-		QUAD_CONSTANT(SinQuarterPi, sinQuarterPi);
+#include "constants.h"
 
 	};
 }

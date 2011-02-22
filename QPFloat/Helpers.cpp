@@ -33,8 +33,12 @@ byte ind[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,127,255,255};
 byte posInf[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 127};
 byte negInf[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 byte e[16] = {122,78,64,172,184,95,53,149,118,69,177,168,240,91,0,64};
+//the next two are used to do Log functions, since they are all based on the base 2 logarithm - since it's fast
+//the base 2 logarithm of e
 byte log2e[16] = {59,210,160,253,15,125,119,225,47,184,82,118,84,113,255,63};
+//the natural logarithm of 2
 byte ln2[16] = {229,7,48,103,199,147,87,243,158,163,239,47,228,98,254,63};
+
 byte twoPi[16] = {184,1,23,197,140,137,105,132,209,66,68,181,31,146,1,64};
 byte pi[16] = {184,1,23,197,140,137,105,132,209,66,68,181,31,146,0,64};
 byte halfPi[16] = {184,1,23,197,140,137,105,132,209,66,68,181,31,146,255,63};
@@ -566,21 +570,56 @@ int FindHeadAndApplyRounding( ui32* buffer, int headScanBackStart )
 #include "ManagedQuadruple.h"
 #include <stdio.h>
 
+__float128 factorials[MAX_FACTORIAL];
+__float128 factorialReciprocals[MAX_FACTORIAL];
+
+
+
+int Initialize()
+{
+	__float128 one = 1;
+	/***** CANT USE QUADONE BECAUSE IT ISNT INITIALIZED YET *****/
+	__float128 current = one;
+	factorialReciprocals[0] = factorials[0] = current;	
+	for (int i = 1; i <= MAX_FACTORIAL; i++)
+	{
+		__float128 temp = (__float128)i;
+		__float128::Mul(current, temp, current);
+		factorials[i] = current;
+		__float128::Div(one, current, factorialReciprocals[i]);
+	}
+
+return 0;
+}
+
+int dontCare = Initialize();
+
 int main(void)
 {
-	__float128 x = 1;
-	__float128 y = 10;
-	__float128 b;
-	//math tests
-	__float128::Div(x, y, b);
-	for (int i = 0; i < 10000; i++)
-		b = __float128::ATan2(y, x);
-	//conversion test
-	double c;
-	__float128::ToDouble(b, c);
-	//string tests
-	Quadruple fromStringTest = Quadruple::FromString("1.567000000000001e+50");
-	String^ toStringTest = fromStringTest.ToString();
+ 	__float128 x = 1;
+	DateTime start = DateTime::Now;
+// 	__float128 y = 10;
+ 	__float128 b;
+// 	//math tests
+// 	__float128::Div(x, y, b);
+ 	for (int i = 0; i < 100000; i++)
+ 		b = __float128::Sin(x);
+	Quadruple check = (Quadruple)b;
+	DateTime stop = DateTime::Now;
+	double elapsed = (stop - start).TotalSeconds;
+	System::Console::WriteLine(elapsed);
+// 	//conversion test
+// 	double c;
+// 	__float128::ToDouble(b, c);
+// 	//string tests
+// 	Quadruple fromStringTest = Quadruple::FromString("1.567000000000001e+50");
+// 	String^ toStringTest = fromStringTest.ToString();
+// 	
+// 	__float128 test = __float128::Exp((__float128)1000);
+// 	double d;
+// 	__float128::ToDouble(test, d);
+
+
 }
 
 #endif

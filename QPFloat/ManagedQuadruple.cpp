@@ -187,6 +187,22 @@ namespace System
 		return result;
 	}
 
+	Quadruple::operator Quadruple(__float128 v)
+	{
+		Quadruple result;
+		pin_ptr<byte> resultPtr = result.storage;
+		*(__float128*)resultPtr = v;
+		return result;
+	}
+
+	Quadruple::operator __float128(Quadruple v)
+	{
+		__float128 result;
+		pin_ptr<byte> vPtr = v.storage;
+		result = *(__float128*)vPtr;
+		return result;
+	}
+
 	void Quadruple::Abs( Quadruple %v, Quadruple %result )
 	{
 		result = v;
@@ -197,6 +213,13 @@ namespace System
 	{
 		pin_ptr<byte> vPtr = v.storage;
 		__float128 result = __float128::Ln(*(__float128*)vPtr);
+		return *(Quadruple*)&result;
+	}
+
+	Quadruple Quadruple::Base2Exp( Quadruple v )
+	{
+		pin_ptr<byte> vPtr = v.storage;
+		__float128 result = __float128::Base2Exp(*(__float128*)vPtr);
 		return *(Quadruple*)&result;
 	}
 
@@ -327,12 +350,17 @@ namespace System
 		if (sign) result->Append("-");
 
 		Quadruple currentValue = *this; //(Quadruple)System::Runtime::InteropServices::Marshal::PtrToStructure((IntPtr)GAHH, Quadruple::typeid);
-
+		int scientificExponent = 0;
+		if (currentValue.IsSubNormal)
+		{
+			currentValue *= Pow(10, 4931);
+			scientificExponent = -4931;
+		}
 		Quadruple::Abs(currentValue, currentValue);
 		Quadruple ten = 10;
 		Quadruple temp = Log(currentValue, ten);
 		int decimalDigitPlace = (int)Floor(temp);
-		int scientificExponent = decimalDigitPlace;
+		scientificExponent += decimalDigitPlace;
 		Quadruple digitMultiplier = ten ^ decimalDigitPlace; //use a round to make sure it's accurate
 		if (currentValue / digitMultiplier >= ten)
 		{
