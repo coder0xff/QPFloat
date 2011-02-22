@@ -86,7 +86,7 @@ namespace System
 			array<byte>^ get();
 			void set( array<byte>^ value );
 		}
-#define useDebugView
+//#define useDebugView
 #ifdef useDebugView
 /* add a forward slash at the beginning of this line to toggle the DebugView type
 		property String^ DebugView

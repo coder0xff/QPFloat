@@ -235,7 +235,6 @@ void __float128::Sub( __float128 &a, __float128 &b, __float128 &result )
 	byte* bData = b.storage;
 
 	//storage for the operations
-	//16-
 	byte buffer[64];
 	memset(buffer, 0, 64);
 	byte* b1 = buffer;
@@ -498,34 +497,14 @@ void __float128::ToInt64(__float128 &v, i64 &result)
 	{
 		result = 0;
 		byte* ptr = v.storage;
-		//conversion to integer should truncate
- 		//bool roundUp = ReadBit(ptr, 111 - exp);
 		BitWindowTransfer(ptr, 0, 112, 112 - exp, &result, 0, 64, 0);
 		SetBit(&result, exp);
 		if (sign)
 		{
 			result = -result;
-// 			if (roundUp)
-// 			{
-// 				if (exp == 62)
-// 				{
-// 					if (result != (i64)0x8000000000000000) result--;
-// 				}
-// 				else
-// 					result--;
-// 			}
 		}
 		else
 		{
-// 			if (roundUp)
-// 			{
-// 				if (exp == 62)
-// 				{
-// 					if (result != (i64)0x7fffffffffffffff) result++;
-// 				}
-// 				else
-// 					result++;
-// 			}
 		}
 		return;
 	}
@@ -549,34 +528,14 @@ void __float128::ToInt32(__float128 &v, i32 &result)
 	{
 		result = 0;
 		byte* ptr = v.storage;
-		//conversion to integer should truncate
-		//bool roundUp = ReadBit(ptr, 111 - exp);
 		BitWindowTransfer(ptr, 0, 112, 112 - exp, &result, 0, 32, 0);
 		SetBit(&result, exp);
 		if (sign)
 		{
 			result = -result;
-// 			if (roundUp)
-// 			{
-// 				if (exp == 30)
-// 				{
-// 					if (result != (i32)0x80000000) result--;
-// 				}
-// 				else
-// 					result--;
-// 			}
 		}
 		else
 		{
-// 			if (roundUp)
-// 			{
-// 				if (exp == 30)
-// 				{
-// 					if (result != (i32)0x7fffffff) result++;
-// 				}
-// 				else
-// 					result++;
-// 			}
 		}
 		return;
 	}
@@ -621,7 +580,6 @@ __float128::__float128()
 
 __float128 __float128::Ln( __float128 &v )
 {
-	// 		if (v.IsNaN) return NaN;
 	return Log2(v) * QuadLn2;
 }
 
@@ -653,18 +611,14 @@ __float128 __float128::PartialExp( __float128 &v )
 	bool affecting = true;
 	while (affecting)
 	{
-		//Quadruple increment = x / factorial;
 		__float128 increment;
 		Div(x, factorial, increment);
 		if (!increment.IsZero() && result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
 		{
-			//result += increment;
 			Add(result, increment, result);
 			iteration++;
 			__float128 temp1 = iteration;
-			//factorial *= iteration;
 			Mul(factorial, temp1, factorial);
-			//x *= this;
 			Mul(x, v, x);
 		}
 		else
@@ -696,8 +650,6 @@ __float128 __float128::Base2Exp(i32 exponent)
 
 __float128 __float128::Base2Exp (__float128 &v)
 {
-	double checkV;
-	__float128::ToDouble(v, checkV);
 	i32 integerPortion;
 	__float128 fractionalPortion;
 	if (v > QuadZero)
@@ -713,14 +665,10 @@ __float128 __float128::Base2Exp (__float128 &v)
 		ToInt32(temp, integerPortion);
 	}
 	__float128 temp = (__float128)integerPortion;
-	__float128::ToDouble(temp, checkV);
 	fractionalPortion = v - temp;
-	int fractionPortionExp = fractionalPortion.GetBase2Exponent();
-	__float128::ToDouble(fractionalPortion, checkV);
 	__float128 fromIntegerPortion = Base2Exp(integerPortion); //this may result in Infinity, subnormal, or zero
 	if (fromIntegerPortion.IsInfinite() || fromIntegerPortion.IsZero()) return fromIntegerPortion;
 	Mul(fractionalPortion, QuadLn2, fractionalPortion);
-	__float128::ToDouble(fractionalPortion, checkV);
 	__float128 fromFractionPortion = PartialExp(fractionalPortion);
 	return fromIntegerPortion * fromFractionPortion;
 }
@@ -774,11 +722,8 @@ __float128 __float128::Sin( __float128 &v )
 {
 	if (v.IsNaN()) return v;
 	//first wrap to -2Pi < x < 2Pi
-	//double checkValues = v.ToDouble();
 	__float128 temp = v + QuadHalfPi;
-	//checkValues = temp.ToDouble();
 	Div(temp, QuadTwoPi, temp);
-	//temp = temp / QuadTwoPi;
 	temp = Fraction(temp);
 	if (temp.GetSign()) Add(temp, QuadOne, temp);
 	bool negate = false;
@@ -791,43 +736,26 @@ __float128 __float128::Sin( __float128 &v )
 	Sub(temp, QuadHalfPi, temp);
 	if (temp.IsZero()) return v;
 
-	//double dCurrentX = temp.ToDouble();
 	__float128 currentX = temp;
-	//negVSquared = -temp * temp
-	//double dNegVSquared = -dCurrentX * dCurrentX;
 	__float128 negVSquared;
 	Mul(temp, temp, negVSquared);
 	Negate(negVSquared);
 
-	//__float128 iteration = QuadOne;
 	int iIteration = 1;
 	__float128 factorial = QuadOne;
-	//double dFactorial = 1;
 	__float128 result = QuadZero;
-	//double dResult = 0;
 	__float128 one = QuadOne;
 	bool affecting = true;
 	while (affecting)
 	{
-		//double dIncrement = dCurrentX / dFactorial;
 		__float128 increment;
 		__float128 factorialReciprocal = __float128::FactorialReciprocal(iIteration);
 		iIteration += 2;
 		Mul(currentX, factorialReciprocal, increment);
 		if (!increment.IsZero() && result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
 		{
-			//dResult += dIncrement;
 			Add(result, increment, result);
-			//dCurrentX *= dNegVSquared;
 			Mul(currentX, negVSquared, currentX);
-			//iIteration++;
-			//Add(iteration, one, iteration);
-			//dFactorial *= iIteration;
-			//Mul(factorial, iteration, factorial);
-			//iIteration++;
-			//Add(iteration, one, iteration);
-			//dFactorial *= iIteration;
-			//Mul(factorial, iteration, factorial);
 		}
 		else
 		{
@@ -851,13 +779,10 @@ void __float128::SinCos( __float128 &v, __float128 &resultSin, __float128 &resul
 		resultCos = resultSin = QuadNaN;
 	}
 	//first wrap to -2Pi < x < 2Pi
-	//double checkValues = v.ToDouble();
 	__float128 tempSin = v + QuadHalfPi;
 	__float128 tempCos = v + QuadPi;
-	//checkValues = temp.ToDouble();
 	Div(tempSin, QuadTwoPi, tempSin);
 	Div(tempCos, QuadTwoPi, tempCos);
-	//temp = temp / QuadTwoPi;
 	tempSin = Fraction(tempSin);
 	tempCos = Fraction(tempCos);
 	if (tempSin.GetSign()) Add(tempSin, QuadOne, tempSin);
@@ -884,11 +809,8 @@ void __float128::SinCos( __float128 &v, __float128 &resultSin, __float128 &resul
 	Mul(tempCos, QuadTwoPi, tempCos);
 	Sub(tempCos, QuadHalfPi, tempCos);
 
-	//double dCurrentX = temp.ToDouble();
 	__float128 currentXSin = tempSin;
 	__float128 currentXCos = tempCos;
-	//negVSquared = -temp * temp
-	//double dNegVSquared = -dCurrentX * dCurrentX;
 	__float128 negVSquaredSin;
 	Mul(tempSin, tempSin, negVSquaredSin);
 	Negate(negVSquaredSin);
@@ -897,21 +819,15 @@ void __float128::SinCos( __float128 &v, __float128 &resultSin, __float128 &resul
 	Mul(tempCos, tempCos, negVSquaredCos);
 	Negate(negVSquaredCos);
 
-	//__float128 iteration = QuadOne;
 	int iIteration = 1;
-	//__float128 factorial = QuadOne;
-	//double dFactorial = 1;
 	resultSin = QuadZero;
 	resultCos = QuadZero;
-	//double dResult = 0;
 	__float128 one = QuadOne;
 	bool affecting = true;
 	while (affecting)
 	{
-		//double dIncrement = dCurrentX / dFactorial;
 		__float128 factorialReciprocal = FactorialReciprocal(iIteration);
 		iIteration += 2;
-		//Div(QuadOne, factorial, factorialReciprocal);
 		__float128 incrementSin;
 		Mul(currentXSin, factorialReciprocal, incrementSin);
 		__float128 incrementCos;
@@ -921,20 +837,11 @@ void __float128::SinCos( __float128 &v, __float128 &resultSin, __float128 &resul
 			(!incrementCos.IsZero()
 			&& resultCos.GetBase2Exponent() - incrementCos.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS))
 		{
-			//dResult += dIncrement;
 			Add(resultSin, incrementSin, resultSin);
 			Add(resultCos, incrementCos, resultCos);
-			//dCurrentX *= dNegVSquared;
+
 			Mul(currentXSin, negVSquaredSin, currentXSin);
 			Mul(currentXCos, negVSquaredCos, currentXCos);
-			//iIteration++;
-			//Add(iteration, one, iteration);
-			//dFactorial *= iIteration;
-			//Mul(factorial, iteration, factorial);
-			//iIteration++;
-			//Add(iteration, one, iteration);
-			//dFactorial *= iIteration;
-			//Mul(factorial, iteration, factorial);
 		}
 		else
 		{
@@ -996,7 +903,7 @@ __float128 __float128::ASin( __float128 &v )
 		Mul(increment, vPowI2PlusOne, increment);		
 		//double dIncrement = increment.ToDouble();
 
-		if (increment.IsZero() || result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
+		if (!increment.IsZero() && result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
 		{
 			//dResult += dIncrement;
 			Add(result, increment, result);
@@ -1114,7 +1021,7 @@ __float128 __float128::ATan( __float128 &v )
 		__float128 increment;
 		Div(vPowI2PlusOne, i2PlusOne, increment);
 
-		if (increment.IsZero() || result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
+		if (!increment.IsZero() && result.GetBase2Exponent() - increment.GetBase2Exponent() <= QUAD_SIGNIFICANT_BITS)
 		{
 			//dResult += dIncrement;
 			if (signFlip)
