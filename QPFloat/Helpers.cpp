@@ -563,9 +563,6 @@ int FindHeadAndApplyRounding( ui32* buffer, int headScanBackStart )
 #pragma managed
 #endif
 
-//TEST is defined when the build is set to Test, which generates an exe instead of a dll
-#ifdef TEST
-
 #include "__float128.h"
 #include "ManagedQuadruple.h"
 #include <stdio.h>
@@ -594,6 +591,8 @@ return 0;
 
 int dontCare = Initialize();
 
+//TEST is defined when the build is set to Test, which generates an exe instead of a dll
+#ifdef TEST
 int main(void)
 {
  	__float128 x = 1;
