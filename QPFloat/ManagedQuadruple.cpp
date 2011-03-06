@@ -367,13 +367,13 @@ namespace System
 			//an error occurred calculating the logarithm - specifically numeric rounding error
 			decimalDigitPlace++;
 			scientificExponent++;
-			digitMultiplier = ten ^ decimalDigitPlace;
 		}
-		if (decimalDigitPlace < 0) decimalDigitPlace; //start from the ones place at minimum
-		currentValue = currentValue / digitMultiplier;
 		int displayedDigitPlaces = 0;
-		if (scientificExponent < 40 && scientificExponent > -10)
+		if (scientificExponent < 40 && scientificExponent > -5)
 		{
+			if (decimalDigitPlace < 0 ) decimalDigitPlace = 0; //start from the ones place at minimum
+			digitMultiplier = ten ^ decimalDigitPlace;
+			currentValue = currentValue / digitMultiplier;
 			//it's not excessively large or small, so we'll display it without scientific notation
 			while ((currentValue != Quadruple::Zero || decimalDigitPlace >= 0) && displayedDigitPlaces < 34)
 			{
@@ -393,6 +393,8 @@ namespace System
 		}
 		else
 		{
+			digitMultiplier = ten ^ decimalDigitPlace;
+			currentValue = currentValue / digitMultiplier;
 			result->Append(currentValue.ToString());
 			result->Append("e");
 			if (scientificExponent > 0) result->Append("+");
