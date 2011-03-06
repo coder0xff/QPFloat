@@ -53,8 +53,11 @@ using namespace System::Runtime::InteropServices;
 
 namespace System
 {
+	[Serializable]
 	public ref class UnderflowException : ArithmeticException {};
+	[Serializable]
 	public ref class InexactException : ArithmeticException {};
+	[Serializable]
 	public ref class InvalidException : ArithmeticException {};
 
 	[System::Diagnostics::DebuggerDisplayAttribute("{ToString()}")]
@@ -86,7 +89,7 @@ namespace System
 			array<byte>^ get();
 			void set( array<byte>^ value );
 		}
-//#define useDebugView
+#define useDebugView
 #ifdef useDebugView
 /* add a forward slash at the beginning of this line to toggle the DebugView type
 		property String^ DebugView
@@ -120,7 +123,7 @@ namespace System
 		FPU_EXCEPTION_DECLARATION(Invalid);
 		FPU_EXCEPTION_DECLARATION(Inexact);
 	public:
-		property bool Sign
+		property bool IsSigned
 		{
 			inline bool get()
 			{
@@ -147,7 +150,7 @@ namespace System
 			{
 				if (value >= QUAD_EXPONENT_MAX)
 				{
-					if (Sign)
+					if (IsSigned)
 						*this = NegativeInfinity;
 					else
 						*this = PositiveInfinity;
@@ -226,6 +229,10 @@ namespace System
 			Negate(a);
 			return a;
 		}
+		static inline Quadruple operator+(Quadruple a)
+		{
+			return a;
+		}
 		static void Add( Quadruple %a, Quadruple %b, [Out] Quadruple %result );
 		static void Sub( Quadruple %a, Quadruple %b, [Out] Quadruple %result );
 		static void Mul( Quadruple %a, Quadruple %b, [Out] Quadruple %result );
@@ -264,29 +271,29 @@ namespace System
 			Div(a, b, result);
 			return result;
 		}
-		static bool operator ==(Quadruple %a, Quadruple %b);
-		static bool operator !=(Quadruple %a, Quadruple %b);
-		static bool operator >(Quadruple %a, Quadruple %b);
-		static bool operator <(Quadruple %a, Quadruple %b);
-		static bool inline operator >=(Quadruple %a, Quadruple %b)
+		static bool operator ==(Quadruple a, Quadruple b);
+		static bool operator !=(Quadruple a, Quadruple b);
+		static bool operator >(Quadruple a, Quadruple b);
+		static bool operator <(Quadruple a, Quadruple b);
+		static bool inline operator >=(Quadruple a, Quadruple b)
 		{
 			if (a == b) return true; //ensure that equals test happens first because it's much faster
 			else return a > b;
 		}
-		static bool inline operator <=(Quadruple %a, Quadruple %b)
+		static bool inline operator <=(Quadruple a, Quadruple b)
 		{
 			if (a == b) return true; //ensure that equals test happens first because it's much faster
 			else return a < b;
 		}
 
 #pragma warning(disable: 4460)
-		static Quadruple inline operator++(Quadruple %a)
+		static Quadruple inline operator++(Quadruple a)
 		{
 			Quadruple temp = One;
 			Add(a, temp, temp);
 			return temp;
 		}
-		static Quadruple inline operator--(Quadruple %a)
+		static Quadruple inline operator--(Quadruple a)
 		{
 			Quadruple temp = One;
 			Sub(a, temp, temp);
@@ -326,6 +333,10 @@ namespace System
 		static Quadruple Base2Exp(Quadruple v);
 		static Quadruple Exp(Quadruple v);
 		static Quadruple Pow(Quadruple base, Quadruple exponent);
+		static inline Quadruple Sqrt(Quadruple value)
+		{
+			return Pow(value, Quadruple::Half);
+		}
 		static Quadruple inline operator^(Quadruple a, Quadruple b)
 		{
 			return Pow(a, b);
@@ -376,8 +387,16 @@ namespace System
 		static Quadruple ATan2(Quadruple y, Quadruple x);
 
 		virtual String^ ToString() override;
+		String^ ToString(String^ format);
+		String^ ToString(IFormatProvider^ provider);
+		String^ ToString(String^ format, IFormatProvider^ provider);
 		static Quadruple FromString(String^ s);
 
+		static inline int Sign(Quadruple v)
+		{
+			if (v.IsZero) return 0;
+			return v.IsSigned ? -1 : 1;
+		}
 #include "constants.h"
 
 	};

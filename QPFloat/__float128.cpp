@@ -607,7 +607,6 @@ __float128 __float128::PartialExp( __float128 &v )
 	__float128 factorial = 1;
 	int iteration = 1;
 	__float128 x = v;
-	__float128 temp1;
 	bool affecting = true;
 	while (affecting)
 	{
@@ -822,10 +821,11 @@ void __float128::SinCos( __float128 &v, __float128 &resultSin, __float128 &resul
 	int iIteration = 1;
 	resultSin = QuadZero;
 	resultCos = QuadZero;
-	__float128 one = QuadOne;
+
 	bool affecting = true;
 	while (affecting)
 	{
+		//double dIncrement = dCurrentX / dFactorial;
 		__float128 factorialReciprocal = FactorialReciprocal(iIteration);
 		iIteration += 2;
 		__float128 incrementSin;

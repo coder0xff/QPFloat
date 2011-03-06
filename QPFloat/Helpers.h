@@ -63,8 +63,8 @@ cd(sinQuarterPi);
  #define MAX_FACTORIAL 1754
 struct __float128;
 
-extern __float128 factorials[MAX_FACTORIAL];
-extern __float128 factorialReciprocals[MAX_FACTORIAL];
+extern __float128 factorials[MAX_FACTORIAL + 1];
+extern __float128 factorialReciprocals[MAX_FACTORIAL + 1];
 
 #define QUAD_SIGNIFICANT_BITS 112
 #define QUAD_EXPONENT_BITS 15

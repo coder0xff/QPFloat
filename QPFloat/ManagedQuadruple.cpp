@@ -57,7 +57,7 @@ namespace System
 		{
 			//no bits
 			result = 0;
-			result.Sign = sign;
+			result.IsSigned = sign;
 			return;
 		}
 		int currentExponent = biasedExponentAtScanStart + implicitPosition - headScanBackStart;
@@ -74,7 +74,7 @@ namespace System
 		int expInc = currentExponent - biasedExponentAtScanStart;
 		result.biasedExponent = (ui16)currentExponent;
 		BitBlockTransfer(buffer, headScanBackStart + expInc - 112, rPtr, 0, 112);
-		result.Sign = sign;
+		result.IsSigned = sign;
 		if (currentExponent == 0) Underflow();
 		if (EnableInexactException) if (ReverseBitScan((ui32*)buffer, 0, headScanBackStart + expInc - 112 - 1) != -1) Inexact();
 	}
@@ -112,28 +112,28 @@ namespace System
 		__float128::Div(*(__float128*)aPtr, *(__float128*)bPtr, *(__float128*)rPtr);
 	}
 
-	bool Quadruple::operator==( Quadruple %a, Quadruple %b )
+	bool Quadruple::operator==( Quadruple a, Quadruple b )
 	{
 		pin_ptr<byte> aPtr = a.storage;
 		pin_ptr<byte> bPtr = b.storage;
 		return (*(__float128*)aPtr) == (*(__float128*)bPtr);
 	}
 
-	bool Quadruple::operator!=( Quadruple %a, Quadruple %b )
+	bool Quadruple::operator!=( Quadruple a, Quadruple b )
 	{
 		pin_ptr<byte> aPtr = a.storage;
 		pin_ptr<byte> bPtr = b.storage;
 		return (*(__float128*)aPtr) != (*(__float128*)bPtr);
 	}
 
-	bool Quadruple::operator>( Quadruple %a, Quadruple %b )
+	bool Quadruple::operator>( Quadruple a, Quadruple b )
 	{
 		pin_ptr<byte> aPtr = a.storage;
 		pin_ptr<byte> bPtr = b.storage;
 		return (*(__float128*)aPtr) > (*(__float128*)bPtr);
 	}
 
-	bool Quadruple::operator<( Quadruple %a, Quadruple %b )
+	bool Quadruple::operator<( Quadruple a, Quadruple b )
 	{
 		pin_ptr<byte> aPtr = a.storage;
 		pin_ptr<byte> bPtr = b.storage;
@@ -206,7 +206,7 @@ namespace System
 	void Quadruple::Abs( Quadruple %v, Quadruple %result )
 	{
 		result = v;
-		result.Sign = false;
+		result.IsSigned = false;
 	}
 
 	Quadruple Quadruple::Ln( Quadruple v )
@@ -342,11 +342,11 @@ namespace System
 		if (IsNaN) return "NaN";
 		if (*this == PositiveInfinity) return "Infinity";
 		if (*this == NegativeInfinity) return "-Infinity";
-		if (IsZero) return Sign ? "-0" : "0";
+		if (IsZero) return IsSigned ? "-0" : "0";
 		System::Text::StringBuilder^ result = gcnew System::Text::StringBuilder();
 		//if we are just appending zeros after the decimal, then put them in a temporary buffer
 		System::Text::StringBuilder^ nonZeroWaitCache = gcnew System::Text::StringBuilder();
-		bool sign = this->Sign;
+		bool sign = this->IsSigned;
 		if (sign) result->Append("-");
 
 		Quadruple currentValue = *this; //(Quadruple)System::Runtime::InteropServices::Marshal::PtrToStructure((IntPtr)GAHH, Quadruple::typeid);
@@ -403,6 +403,37 @@ namespace System
 		return result->ToString();
 	}
 
+	String^ Quadruple::ToString( String^ format, IFormatProvider^ provider )
+	{
+		//todo: Implement this correctly
+		//see http://msdn.microsoft.com/en-us/library/6dx8etks%28v=vs.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/427bttx3%28v=VS.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.iformatprovider.getformat.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.globalization.numberformatinfo.aspx
+		// 
+		return ToString();
+	}
+
+	String^ Quadruple::ToString( String^ format)
+	{
+		//todo: Implement this correctly
+		//see http://msdn.microsoft.com/en-us/library/6dx8etks%28v=vs.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/427bttx3%28v=VS.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.iformatprovider.getformat.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.globalization.numberformatinfo.aspx
+		// 
+		return ToString();
+	}
+	String^ Quadruple::ToString(IFormatProvider^ provider )
+	{
+		//todo: Implement this correctly
+		//see http://msdn.microsoft.com/en-us/library/6dx8etks%28v=vs.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/427bttx3%28v=VS.85%29.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.iformatprovider.getformat.aspx
+		//see http://msdn.microsoft.com/en-us/library/system.globalization.numberformatinfo.aspx
+		// 
+		return ToString();
+	}
 	System::Quadruple Quadruple::FromString( String^ str )
 	{
 		str = str->Trim();
@@ -410,7 +441,7 @@ namespace System
 		Quadruple result = 0;
 		if (s->default[0] == '-')
 		{
-			result.Sign = true;
+			result.IsSigned = true;
 			s->Remove(0, 1);
 		}
 		Quadruple ten = 10;
