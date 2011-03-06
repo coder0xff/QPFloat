@@ -151,17 +151,17 @@ __float128 __float128::PartialLn( __float128 &v )
 
 void __float128::Add( __float128 &a, __float128 &b, __float128 &result )
 {
-	//can only add values of the same sign. we do this check first so we don't repeat the other checks
-	bool aSign = a.GetSign();
-	bool bSign = b.GetSign();
-	if (aSign && !bSign) { __float128 temp; Negate(a, temp); Sub(b, temp, result); return; }
-	if (!aSign && bSign) { __float128 temp; Negate(b, temp); Sub(a, temp, result); return; }
 	//if either value is NaN, then result is NaN
 	if (a.IsNaN()) { result = a; return; }
 	if (b.IsNaN()) { result = b; return; }
 	//check for the special case of zero
 	if (a.IsZero())	{ result = b; return; }
 	if (b.IsZero())	{ result = a; return; }
+	//can only add values of the same sign. we do this check first so we don't repeat the other checks
+	bool aSign = a.GetSign();
+	bool bSign = b.GetSign();
+	if (aSign && !bSign) { __float128 temp; Negate(a, temp); Sub(b, temp, result); return; }
+	if (!aSign && bSign) { __float128 temp; Negate(b, temp); Sub(a, temp, result); return; }
 	//cache the exponents
 	int aExponent = a.GetBiasedExponent();
 	int bExponent = b.GetBiasedExponent();
@@ -216,12 +216,12 @@ void __float128::Add( __float128 &a, __float128 &b, __float128 &result )
 void __float128::Sub( __float128 &a, __float128 &b, __float128 &result )
 {
 	//see Add for notes on all these special cases, as they are nearly identical
-	bool aSign = a.GetSign();
-	if (aSign != b.GetSign()) { __float128 temp; Negate(b, temp); Add(result, a, temp); return; }
 	if (a.IsNaN()) { result = a; return; }
 	if (b.IsNaN()) { result = b; return; }
 	if (b.IsZero())	{ result = a; return; }
 	if (a.IsZero())	{ Negate(b, result); return; }
+	bool aSign = a.GetSign();
+	if (aSign != b.GetSign()) { __float128 temp; Negate(b, temp); Add(a, temp, result); return; }
 	int aExponent = a.GetBiasedExponent();
 	int bExponent = b.GetBiasedExponent();
 	if (aExponent == QUAD_EXPONENT_MASK && bExponent == QUAD_EXPONENT_MASK) { result = QuadIndefinite; Invalid(); return; } //already know signs are the same
@@ -743,7 +743,6 @@ __float128 __float128::Sin( __float128 &v )
 	int iIteration = 1;
 	__float128 factorial = QuadOne;
 	__float128 result = QuadZero;
-	__float128 one = QuadOne;
 	bool affecting = true;
 	while (affecting)
 	{
