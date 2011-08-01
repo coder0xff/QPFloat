@@ -109,7 +109,7 @@ ui64 computeMask( i32 bitOffset, byte bitCount )
 	}
 }
 
-void BitBlockTransfer( void* _source, int sourceBitOffset, void* _destination, int destinationBitOffset, int bitCount )
+void BitBlockTransfer(const void* _source, int sourceBitOffset, void* _destination, int destinationBitOffset, int bitCount )
 {
 	if (bitCount == 0) return; //algorithm 0
 	byte* source = (byte*)_source;
@@ -280,7 +280,7 @@ void BitBlockTransfer( void* _source, int sourceBitOffset, void* _destination, i
 	}
 }
 
-void BitWindowTransfer(void* source, int sourceWindowBitOffset, int sourceWindowBitSize, int sourceWindowAlignBit, void* destination, int destinationWindowBitOffset, int destinationWindowBitSize, int destinationWindowAlignBit )
+void BitWindowTransfer(const void* source, int sourceWindowBitOffset, int sourceWindowBitSize, int sourceWindowAlignBit, void* destination, int destinationWindowBitOffset, int destinationWindowBitSize, int destinationWindowAlignBit )
 {
 	int srcOffToAln = sourceWindowAlignBit - sourceWindowBitOffset;
 	int dstOffToAln = destinationWindowAlignBit - destinationWindowBitOffset;
@@ -595,10 +595,30 @@ int dontCare = Initialize();
 #ifdef TEST
 int main(void)
 {
-	Quadruple a, b, c;
-	a = -1;
-	b = 0;
-	c = a-b;
+ 	__float128 x = 1;
+	DateTime start = DateTime::Now;
+// 	__float128 y = 10;
+ 	__float128 b;
+// 	//math tests
+// 	__float128::Div(x, y, b);
+ 	for (int i = 0; i < 100000; i++)
+ 		b = __float128::Sin(x);
+	Quadruple check = (Quadruple)b;
+	DateTime stop = DateTime::Now;
+	double elapsed = (stop - start).TotalSeconds;
+	System::Console::WriteLine(elapsed);
+// 	//conversion test
+// 	double c;
+// 	__float128::ToDouble(b, c);
+// 	//string tests
+// 	Quadruple fromStringTest = Quadruple::FromString("1.567000000000001e+50");
+// 	String^ toStringTest = fromStringTest.ToString();
+// 	
+// 	__float128 test = __float128::Exp((__float128)1000);
+// 	double d;
+// 	__float128::ToDouble(test, d);
+
+
 }
 
 #endif

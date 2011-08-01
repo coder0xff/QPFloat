@@ -29,14 +29,14 @@ struct DoubleDecomposition
 {
 public:
 	double value;
-	bool GetSign();
+	bool GetSign() const;
 	void SetSign(bool value);
-	ui16 GetBiasedExponent();
+	ui16 GetBiasedExponent() const;
 	void SetBiasedExponent(ui16 value);
-	int GetUnbiasedExponent();
+	int GetUnbiasedExponent() const;
 	void SetUnbiasedExponent(int value);
-	void GetMantissa(byte* data, int byteCount);
-	void SetMantissa(byte* data, int byteCount);
+	void GetMantissa(byte* data, int byteCount) const;
+	void SetMantissa(const byte* data, int byteCount);
 };
 
 #ifdef _MANAGED

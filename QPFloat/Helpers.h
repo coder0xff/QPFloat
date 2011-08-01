@@ -19,8 +19,12 @@ This file is part of QPFloat.
 */
 
 #pragma once
+#ifdef _MANAGED
+#pragma unmanaged
 #include <intrin.h>
 #include <memory>
+#pragma  managed
+#endif
 
 typedef unsigned long long ui64;
 typedef long long i64;
@@ -85,7 +89,7 @@ extern bool enableInexactException;
 #pragma unmanaged
 #endif
 
-bool inline ReadBit(void const *buffer, long bitOffset)
+bool inline ReadBit(const void *buffer, long bitOffset)
 {
 	return _bittest((const long*)buffer, bitOffset) != 0;
 }
@@ -159,9 +163,9 @@ ui64 computeMask(i32 bitOffset, byte bitCount);
 
 void ClearBlock(void* destination, int destinationBitOffset, int bitCount);
 
-void BitBlockTransfer(void* source, int sourceBitOffset, void* destination, int destinationBitOffset, int bitCount);
+void BitBlockTransfer(const void* source, int sourceBitOffset, void* destination, int destinationBitOffset, int bitCount);
 
-void BitWindowTransfer(void* source, int sourceWindowBitOffset, int sourceWindowBitSize, int sourceWindowAlignBit, void* destination, int destinationWindowBitOffset, int destinationWindowBitSize, int destinationWindowAlignBit);
+void BitWindowTransfer(const void* source, int sourceWindowBitOffset, int sourceWindowBitSize, int sourceWindowAlignBit, void* destination, int destinationWindowBitOffset, int destinationWindowBitSize, int destinationWindowAlignBit);
 
 void IntBlockAdd(ui64* a, ui64* b, byte longCount);
 

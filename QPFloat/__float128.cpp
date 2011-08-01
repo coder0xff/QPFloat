@@ -88,7 +88,7 @@ void __float128::ReadOutResult( ui32 *buffer, int headScanBackStart, int biasedE
 	if (enableInexactException) if (ReverseBitScan((ui32*)buffer, 0, headScanBackStart + expInc - 112 - 1 + (currentExponent == 0 ? 1 : 0)) != -1) Inexact();
 }
 
-__float128 __float128::PartialLn( __float128 &v )
+__float128 __float128::PartialLn( const __float128 &v )
 {
 	if (v == QuadOne) return QuadZero;
 	//todo: implement a faster algorithm - though this is only used for 1 <= x < 2 (hence partial), so it's not too bad
@@ -149,7 +149,7 @@ __float128 __float128::PartialLn( __float128 &v )
 	return result;
 }
 
-void __float128::Add( __float128 &a, __float128 &b, __float128 &result )
+void __float128::Add( const __float128 &a, const __float128 &b, __float128 &result )
 {
 	//if either value is NaN, then result is NaN
 	if (a.IsNaN()) { result = a; return; }
@@ -177,8 +177,8 @@ void __float128::Add( __float128 &a, __float128 &b, __float128 &result )
 	if (exponentDistance < -QUAD_SIGNIFICANT_BITS - 2) { result = b;	return; }
 
 	//pin the data
-	byte* aData = a.storage;
-	byte* bData = b.storage;
+	const byte* aData = a.storage;
+	const byte* bData = b.storage;
 
 	//storage for performing the operations
 	//[0] and [16] are guard bits since we offset everything by 8
@@ -213,7 +213,7 @@ void __float128::Add( __float128 &a, __float128 &b, __float128 &result )
 	ReadOutResult((ui32*)b1, 112 + 8 + 1, resultExponent + 1, aSign, result);
 }
 
-void __float128::Sub( __float128 &a, __float128 &b, __float128 &result )
+void __float128::Sub( const __float128 &a, const __float128 &b, __float128 &result )
 {
 	//see Add for notes on all these special cases, as they are nearly identical
 	if (a.IsNaN()) { result = a; return; }
@@ -231,8 +231,8 @@ void __float128::Sub( __float128 &a, __float128 &b, __float128 &result )
 	//exponentDistance early rejection doesn't work for subtraction (L.O. subs bubble up to H.O. bits)
 
 	//pin the data
-	byte* aData = a.storage;
-	byte* bData = b.storage;
+	const byte* aData = a.storage;
+	const byte* bData = b.storage;
 
 	//storage for the operations
 	byte buffer[64];
@@ -280,7 +280,7 @@ void __float128::Sub( __float128 &a, __float128 &b, __float128 &result )
 	ReadOutResult((ui32*)b1, 112 + 128, resultExponent, aSign ^ negatedForValue, result);
 }
 
-void __float128::Mul( __float128 &a, __float128 &b, __float128 &result )
+void __float128::Mul( const __float128 &a, const __float128 &b, __float128 &result )
 {
 	if (a.IsNaN()) { result = a; return; }
 	if (b.IsNaN()) { result = b; return; }
@@ -306,8 +306,8 @@ void __float128::Mul( __float128 &a, __float128 &b, __float128 &result )
 	byte* b1 = buffer;
 	byte* b2 = buffer + 16;
 	byte* res = buffer + 32;
-	byte* aPtr = a.storage;
-	byte* bPtr = b.storage;
+	const byte* aPtr = a.storage;
+	const byte* bPtr = b.storage;
 	bool aSubNormal = a.IsSubNormal();
 	bool bSubNormal = b.IsSubNormal();
 	BitBlockTransfer(aPtr, 0, b1, aSubNormal ? 1 : 0, 112);
@@ -319,7 +319,7 @@ void __float128::Mul( __float128 &a, __float128 &b, __float128 &result )
 	ReadOutResult((ui32*)res, 112 * 2 + 2, resultExponent + 2,  aSign ^ bSign, result);
 }
 
-void __float128::Div( __float128 &a, __float128 &b, __float128 &result )
+void __float128::Div( const __float128 &a, const __float128 &b, __float128 &result )
 {
 	if (a.IsNaN()) { result = a; return; }
 	if (b.IsNaN()) { result = b; return; }
@@ -352,8 +352,8 @@ void __float128::Div( __float128 &a, __float128 &b, __float128 &result )
 	byte* b2 = buffer;
 	byte* b1 = buffer + 16;
 	byte* res = buffer + 48;
-	byte* aPtr = a.storage;
-	byte* bPtr = b.storage;
+	const byte* aPtr = a.storage;
+	const byte* bPtr = b.storage;
 	bool aIsSubNormal = a.IsSubNormal();
 	bool bIsSubNormal = b.IsSubNormal();
 	BitBlockTransfer(aPtr, 0, b1 + 16, aIsSubNormal ? 1 : 0, 112);
@@ -373,7 +373,7 @@ void __float128::Div( __float128 &a, __float128 &b, __float128 &result )
 		ReadOutResult((ui32*)res, 128, resultExponent, aSign ^ bSign, result);
 }
 
-bool __float128::operator==( __float128 &b )
+bool __float128::operator==( const __float128 &b ) const
 {
 	if (this->IsNaN() || b.IsNaN()) return false; //NaN =/= NaN
 	if (this->IsZero() && b.IsZero()) return true; //-0 = 0
@@ -384,7 +384,7 @@ bool __float128::operator==( __float128 &b )
 	return true;
 }
 
-bool __float128::operator!=( __float128 &b )
+bool __float128::operator!=( const __float128 &b ) const
 {
 	if (this->IsNaN() || b.IsNaN()) return true; //NaN =/= NaN
 	if (this->IsZero() && b.IsZero()) return false;
@@ -395,7 +395,7 @@ bool __float128::operator!=( __float128 &b )
 	return false;
 }
 
-bool __float128::operator>( __float128 &b )
+bool __float128::operator>( const __float128 &b ) const
 {
 	if (this->IsNaN() || b.IsNaN()) return false;
 	bool aSign = this->GetSign();
@@ -410,8 +410,8 @@ bool __float128::operator>( __float128 &b )
 		return !aSign;
 	else
 	{
-		byte* aPtr = this->storage;
-		byte* bPtr = b.storage;
+		const byte* aPtr = this->storage;
+		const byte* bPtr = b.storage;
 		byte temp[32];
 		memset(temp, 0, 32);
 		BitBlockTransfer(aPtr, 0, temp, 0, 112);
@@ -422,7 +422,7 @@ bool __float128::operator>( __float128 &b )
 	}
 }
 
-bool __float128::operator<( __float128 &b )
+bool __float128::operator<( const __float128 &b ) const
 {
 	if (this->IsNaN() || b.IsNaN()) return false;
 	bool aSign = this->GetSign();
@@ -437,8 +437,8 @@ bool __float128::operator<( __float128 &b )
 		return aSign;
 	else
 	{
-		byte* aPtr = this->storage;
-		byte* bPtr = b.storage;
+		const byte* aPtr = this->storage;
+		const byte* bPtr = b.storage;
 		byte temp[32];
 		memset(temp, 0, 32);
 		BitBlockTransfer(aPtr, 0, temp, 0, 112);
@@ -469,7 +469,7 @@ __float128::__float128(double v)
 		SetBase2Exponent(d.GetUnbiasedExponent());
 }
 
-void __float128::ToDouble(__float128 &v, double &result)
+void __float128::ToDouble( const __float128 &v, double &result)
 {
 	DoubleDecomposition _result;
 	_result.value = 0;
@@ -479,7 +479,7 @@ void __float128::ToDouble(__float128 &v, double &result)
 	result = _result.value;
 }
 
-void __float128::ToInt64(__float128 &v, i64 &result)
+void __float128::ToInt64( const __float128 &v, i64 &result)
 {
 	bool sign = v.GetSign();
 	int exp = v.GetBase2Exponent();
@@ -496,7 +496,7 @@ void __float128::ToInt64(__float128 &v, i64 &result)
 	else
 	{
 		result = 0;
-		byte* ptr = v.storage;
+		const byte* ptr = v.storage;
 		BitWindowTransfer(ptr, 0, 112, 112 - exp, &result, 0, 64, 0);
 		SetBit(&result, exp);
 		if (sign)
@@ -510,7 +510,7 @@ void __float128::ToInt64(__float128 &v, i64 &result)
 	}
 }
 
-void __float128::ToInt32(__float128 &v, i32 &result)
+void __float128::ToInt32( const __float128 &v, i32 &result)
 {
 	bool sign = v.GetSign();
 	int exp = v.GetBase2Exponent();
@@ -527,7 +527,7 @@ void __float128::ToInt32(__float128 &v, i32 &result)
 	else
 	{
 		result = 0;
-		byte* ptr = v.storage;
+		const byte* ptr = v.storage;
 		BitWindowTransfer(ptr, 0, 112, 112 - exp, &result, 0, 32, 0);
 		SetBit(&result, exp);
 		if (sign)
@@ -595,7 +595,7 @@ __float128 __float128::Log2( __float128 &v )
 	return baseTwoExponent + base2LogOfMantissa;
 }
 
-__float128 __float128::PartialExp( __float128 &v )
+__float128 __float128::PartialExp( const __float128 &v )
 {
 	double checkV;
 	__float128::ToDouble(v, checkV);
@@ -711,12 +711,21 @@ __float128 __float128::Pow( __float128 &base, __float128 &exponent )
 	Mul(temp, exponent, temp);
 	return Base2Exp(temp);
 }
-void __float128::Abs( __float128 &v, __float128 &result )
+void __float128::Abs( const __float128 &v, __float128 &result )
 {
 	result = v;
 	result.SetSign(false);
 }
-
+void __float128::Max( const __float128 &a, const __float128 &b, __float128 &result )
+{
+	result = a;
+	if (!(b < a)) result = b; //by doing !(b < a) we also check if b is NaN
+}
+void __float128::Min( const __float128 &a, const __float128 &b, __float128 &result )
+{
+	result = a;
+	if (!(b > a)) result = b; //by doing !(b > a) we also check if b is NaN
+}
 __float128 __float128::Sin( __float128 &v )
 {
 	if (v.IsNaN()) return v;

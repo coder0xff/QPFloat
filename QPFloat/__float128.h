@@ -57,7 +57,7 @@ private:
 		*ptr &= ~QUAD_EXPONENT_MASK;
 		*ptr |= value;
 	}
-	inline ui16 GetBiasedExponent()
+	inline ui16 GetBiasedExponent() const
 	{
 		return *((ui16*)this + 7) & QUAD_EXPONENT_MASK;
 	}
@@ -65,8 +65,8 @@ private:
 	//the partial functions implement the Taylor series for the function
 	//they are slow on large values, because they have no optimizations
 	//but they are needed by the optimized functions - Ln, and Exp
-	static __float128 PartialLn(__float128 &v);
-	static __float128 PartialExp(__float128 &v);
+	static __float128 PartialLn(const __float128 &v);
+	static __float128 PartialExp(const __float128 &v);
 	static __float128 Factorial(i32 v)
 	{
 		if (v < 0) return QuadNaN;
@@ -81,13 +81,13 @@ private:
 	}
 public:
 	__float128();
-	static inline __float128& FromData(byte *data)
+	static inline __float128& FromData(const byte *data)
 	{
 		return *((__float128*)data);
 	}
-	inline bool GetSign()
+	inline bool GetSign() const
 	{
-		byte* ptr = storage;
+		const byte* ptr = storage;
 		return (*(ptr + 15) & 0x80) != 0;
 	}
 	inline void SetSign(bool value)
@@ -98,7 +98,7 @@ public:
 		else
 			*(ptr + 15) &= 0x7f;
 	}
-	inline i32 GetBase2Exponent()
+	inline i32 GetBase2Exponent() const
 	{
 		return (i32)GetBiasedExponent() - QUAD_EXPONENT_BIAS;
 	}
@@ -115,7 +115,7 @@ public:
 		if (value < QUAD_EXPONENT_MIN) value = QUAD_EXPONENT_MIN;
 		SetBiasedExponent((ui16)(value + QUAD_EXPONENT_BIAS));
 	}
-	inline bool IsZero()
+	inline bool IsZero() const
 	{
 		ui32* ptr = (ui32*)storage;
 		if (*(ptr + 3) != 0)
@@ -127,7 +127,7 @@ public:
 		if (*ptr != 0) return false;
 		return true;
 	}
-	inline bool IsNaN()
+	inline bool IsNaN() const
 	{
 		if (GetBiasedExponent() != 0x7FFF) return false;
 		i32* ptr = (i32*)storage;
@@ -140,7 +140,7 @@ public:
 		if (*(ui16*)ptr != 0) return true;
 		return false;
 	}
-	inline bool IsInfinite()
+	inline bool IsInfinite() const
 	{
 		ui32* ptr = (ui32*)storage;
 		if (*ptr != 0) return false;
@@ -152,7 +152,7 @@ public:
 		if ((*ptr & 0x7FFFFFFF) != 0x7FFF0000) return false;
 		return true;
 	}
-	inline bool IsSubNormal()
+	inline bool IsSubNormal() const
 	{
 		return GetBiasedExponent() == 0 && !IsZero();
 	}
@@ -160,21 +160,21 @@ public:
 	{
 		*(a.storage + 15) ^= 0x80;
 	}
-	static inline void Negate( __float128 &a, __float128 &result )
+	static inline void Negate(const __float128 &a, __float128 &result )
 	{
 		result = a;
 		Negate(result);
 	}
-	__float128 operator-()
+	__float128 operator-() const
 	{
 		__float128 copy = *this;
 		Negate(copy);
 		return copy;
 	}
-	static void Add( __float128 &a, __float128 &b, __float128 &result );
-	static void Sub( __float128 &a, __float128 &b, __float128 &result );
-	static void Mul( __float128 &a, __float128 &b, __float128 &result );
-	static void Div( __float128 &a, __float128 &b, __float128 &result );
+	static void Add( const __float128 &a, const __float128 &b, __float128 &result );
+	static void Sub( const __float128 &a, const __float128 &b, __float128 &result );
+	static void Mul( const __float128 &a, const __float128 &b, __float128 &result );
+	static void Div( const __float128 &a, const __float128 &b, __float128 &result );
 	static inline void Increment( __float128 &v )
 	{
 		Add(v, QuadOne, v);
@@ -184,40 +184,40 @@ public:
 		__float128 temp = QuadOne;
 		Sub(v, temp, v);
 	}
-	__float128 inline operator+(__float128 &b)
+	__float128 inline operator+(const __float128 &b) const
 	{
 		__float128 result;
 		Add(*this, b, result);
 		return result;
 	}
-	__float128 inline operator-(__float128 &b)
+	__float128 inline operator-(const __float128 &b) const
 	{
 		__float128 result;
 		Sub(*this, b, result);
 		return result;
 	}
-	__float128 inline operator*(__float128 &b)
+	__float128 inline operator*(const __float128 &b) const
 	{
 		__float128 result;
 		Mul(*this, b, result);
 		return result;
 	}
-	__float128 inline operator/(__float128 &b)
+	__float128 inline operator/(const __float128 &b) const
 	{
 		__float128 result;
 		Div(*this, b, result);
 		return result;
 	}
-	bool operator ==(__float128 &b);
-	bool operator !=(__float128 &b);
-	bool operator >(__float128 &b);
-	bool operator <(__float128 &b);
-	bool inline operator >=(__float128 &b)
+	bool operator ==(const __float128 &b) const;
+	bool operator !=(const __float128 &b) const;
+	bool operator >(const __float128 &b) const;
+	bool operator <(const __float128 &b) const;
+	bool inline operator >=(const __float128 &b) const
 	{
 		if (*this == b) return true; //ensure that equals test happens first because it's much faster
 		else return *this > b;
 	}
-	bool inline operator <=(__float128 &b)
+	bool inline operator <=(const __float128 &b) const
 	{
 		if (*this == b) return true; //ensure that equals test happens first because it's much faster
 		else return *this < b;
@@ -234,29 +234,43 @@ public:
 		Add(temp, *this, *this);
 		return *this;
 	}
-	__float128 inline operator<<(i32 shift)
+	__float128 inline operator<<(i32 shift) const
 	{
 		__float128 temp = *this;
 		temp.SetBase2Exponent(temp.GetBase2Exponent() + shift);
 		return temp;
 	}
-	__float128 inline operator>>(i32 shift)
+	__float128 inline operator>>(i32 shift) const
 	{
 		__float128 temp = *this;
 		temp.SetBase2Exponent(temp.GetBase2Exponent() - shift);
 		return temp;
 	}
 	__float128(double v);
-	static void ToDouble(__float128 &v, double &result);
+	static void ToDouble(const __float128 &v, double &result);
 	__float128(i64 v);
-	static void ToInt64(__float128 &v, i64 &result);
+	static void ToInt64(const __float128 &v, i64 &result);
 	__float128(i32 v);
-	static void ToInt32(__float128 &v, i32 &result);
-	static void Abs(__float128 &v, __float128 &result);
-	static inline __float128 Abs(__float128 &v)
+	static void ToInt32(const __float128 &v, i32 &result);
+	static void Abs(const __float128 &v, __float128 &result);
+	static inline __float128 Abs(const __float128 &v)
 	{
 		__float128 result;
 		Abs(v, result);
+		return result;
+	}
+	static void Max(const __float128 &a, const __float128 &b, __float128 &result);
+	static inline __float128 Max(const __float128 &a, const __float128 &b)
+	{
+		__float128 result;
+		Max(a, b, result);
+		return result;
+	}
+	static void Min(const __float128 &a, const __float128 &b, __float128 &result);
+	static inline __float128 Min(const __float128 &a, const __float128 &b)
+	{
+		__float128 result;
+		Min(a, b, result);
 		return result;
 	}
 	static __float128 Ln(__float128 &v);

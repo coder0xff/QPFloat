@@ -62,6 +62,7 @@ namespace System
 
 	[System::Diagnostics::DebuggerDisplayAttribute("{ToString()}")]
 	[System::Runtime::InteropServices::StructLayout(System::Runtime::InteropServices::LayoutKind::Explicit)]
+	[System::Serializable]
 	public value struct Quadruple
 	{
 	private:
@@ -327,6 +328,20 @@ namespace System
 		{
 			Quadruple result;
 			Abs(v, result);
+			return result;
+		}
+		static void Max(Quadruple %a, Quadruple %b, [Out] Quadruple %result);
+		static inline Quadruple Max(Quadruple a, Quadruple b)
+		{
+			Quadruple result;
+			Max(a, b, result);
+			return result;
+		}
+		static void Min(Quadruple %a, Quadruple %b, [Out] Quadruple %result);
+		static inline Quadruple Min(Quadruple a, Quadruple b)
+		{
+			Quadruple result;
+			Min(a, b, result);
 			return result;
 		}
 		static Quadruple Ln(Quadruple v);

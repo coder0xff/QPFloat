@@ -35,7 +35,7 @@ This file is part of QPFloat.
 #pragma unmanaged
 #endif
 
-bool DoubleDecomposition::GetSign()
+bool DoubleDecomposition::GetSign() const
 {
 	byte* ptr = (byte*)&value + 7;
 	return (*ptr & (byte)0x80) != 0;
@@ -50,7 +50,7 @@ void DoubleDecomposition::SetSign(bool value)
 		*ptr &= 0x7F;
 }
 
-ui16 DoubleDecomposition::GetBiasedExponent()
+ui16 DoubleDecomposition::GetBiasedExponent() const
 {
 	ui16* ptr = ((ui16*)&this->value) + 3;
 	return (ui16)((*ptr >> 4) & 0x7FF);
@@ -63,7 +63,7 @@ void DoubleDecomposition::SetBiasedExponent(ui16 value)
 	*ptr = (ui16)(*ptr & 0x800F | (value & exponentTruncate) << 4);
 }
 
-int DoubleDecomposition::GetUnbiasedExponent()
+int DoubleDecomposition::GetUnbiasedExponent() const
 {
 	return (int)GetBiasedExponent() - DBL_EXPONENT_BIAS;
 }
@@ -82,13 +82,13 @@ void DoubleDecomposition::SetUnbiasedExponent(int value)
 	SetBiasedExponent((ui16)(value + DBL_EXPONENT_BIAS));
 }
 
-void DoubleDecomposition::GetMantissa(byte* data, int byteCount)
+void DoubleDecomposition::GetMantissa(byte* data, int byteCount) const
 {
 	if (byteCount < DBL_MANTISSA_BYTES) throw -1;
 	BitBlockTransfer(&value, 0, data, byteCount * 8 - DBL_SIGNIFICANT_BITS, DBL_SIGNIFICANT_BITS); //place in H.O.
 }
 
-void DoubleDecomposition::SetMantissa(byte* data, int byteCount)
+void DoubleDecomposition::SetMantissa(const byte* data, int byteCount)
 {
 	if (GetBiasedExponent() == DBL_EXPONENT_MASK)
 	{

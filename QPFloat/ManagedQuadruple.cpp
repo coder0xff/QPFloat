@@ -209,6 +209,18 @@ namespace System
 		result.IsSigned = false;
 	}
 
+	void Quadruple::Max( Quadruple %a, Quadruple %b, Quadruple% result)
+	{
+		result = a;
+		if (!(b < a)) result = b; //by doing !(b < a) we also check if b is NaN
+	}
+
+	void Quadruple::Min( Quadruple %a, Quadruple %b, Quadruple% result)
+	{
+		result = a;
+		if (!(b > a)) result = b; //by doing !(b > a) we also check if b is NaN
+	}
+
 	Quadruple Quadruple::Ln( Quadruple v )
 	{
 		pin_ptr<byte> vPtr = v.storage;
