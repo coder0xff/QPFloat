@@ -742,7 +742,7 @@ __float128 __float128::Sin( __float128 &v )
 	}		
 	Mul(temp, QuadTwoPi, temp);
 	Sub(temp, QuadHalfPi, temp);
-	if (temp.IsZero()) return v;
+	if (temp.IsZero()) return QuadZero;
 
 	__float128 currentX = temp;
 	__float128 negVSquared;
