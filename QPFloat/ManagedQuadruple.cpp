@@ -343,8 +343,8 @@ namespace System
 
 	System::Quadruple Quadruple::ATan2( Quadruple y, Quadruple x )
 	{
-		pin_ptr<byte> yPtr = x.storage;
-		pin_ptr<byte> xPtr = y.storage;
+		pin_ptr<byte> xPtr = x.storage;
+		pin_ptr<byte> yPtr = y.storage;
 		__float128 result = __float128::ATan2(*(__float128*)yPtr, *(__float128*)xPtr);
 		return *(Quadruple*)&result;
 	}
@@ -451,9 +451,10 @@ namespace System
 		str = str->Trim();
 		System::Text::StringBuilder^ s = gcnew System::Text::StringBuilder(str);
 		Quadruple result = 0;
+		bool negative = false;
 		if (s->default[0] == '-')
 		{
-			result.IsSigned = true;
+			negative = true;
 			s->Remove(0, 1);
 		}
 		Quadruple ten = 10;
@@ -487,6 +488,7 @@ namespace System
 		}
 		Quadruple temp = Quadruple::Pow(ten, -postDecimalDigits);
 		Quadruple::Mul(result, temp, result);
+		result.IsSigned = negative;
 		return result;
 	}
 }
