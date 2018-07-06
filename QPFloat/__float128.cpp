@@ -1,6 +1,6 @@
 /*
 Copyright 2010 Brent W. Lewis
-coder0xff on hotmail
+coder0xff on google mail
 
 This file is part of QPFloat.
 
