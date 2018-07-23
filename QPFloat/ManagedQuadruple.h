@@ -63,7 +63,8 @@ namespace System
 	[System::Diagnostics::DebuggerDisplayAttribute("{ToString()}")]
 	[System::Runtime::InteropServices::StructLayout(System::Runtime::InteropServices::LayoutKind::Explicit)]
 	[System::Serializable]
-	public value struct Quadruple
+	public value struct Quadruple 
+		: public IComparable<Quadruple>	//	AK
 	{
 	private:
 		[System::Runtime::InteropServices::FieldOffset(0)]
@@ -412,6 +413,9 @@ namespace System
 			if (v.IsZero) return 0;
 			return v.IsSigned ? -1 : 1;
 		}
+
+		virtual int CompareTo(Quadruple x) override;	//	AK
+
 #include "constants.h"
 
 	};
