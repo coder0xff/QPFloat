@@ -1,0 +1,16 @@
+64 bit Debug|x64 and Test|x64 builds failed (initial symptom: not finding CL.exe)
+Editing project properties
+	I am not certain whether all of the following were necessary
+	I am not certain whether all of the following are ideal for the intended build type
+	Where I found an empty path I simply copied it from another build
+	These changes achieved successful (error-free) builds for each project/cpu/build combo
+
+Project Properties for Debug|x64
+	LibraryPath was empty, changed it to
+		<LibraryPath>$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSdkDir)lib\x64;</LibraryPath>
+
+Project Properties for Test|x64
+	Following were all initially empty
+		<IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+		<LibraryPath>$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSdkDir)lib\x64;</LibraryPath>
+		<ExecutablePath>$(VCInstallDir)bin\x86_amd64;$(VCInstallDir)bin;$(WindowsSdkDir)bin\NETFX 4.0 Tools;$(WindowsSdkDir)bin;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(FrameworkSDKDir)\lib\win64;$(MSBuildToolsPath32);$(FxCopDir);$(PATH);</ExecutablePath>
