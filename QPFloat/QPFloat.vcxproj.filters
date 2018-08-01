@@ -59,7 +59,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="VS 2010 64bit build.txt" />
-  </ItemGroup>
 </Project>
