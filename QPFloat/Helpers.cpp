@@ -81,7 +81,7 @@ i32 ReverseBitScan( ui32* a, byte longCount, i32 startingBit )
 	return -1;
 }
 
-ui64 computeMask( i32 bitOffset, byte bitCount )
+ui64 ComputeMask( i32 bitOffset, byte bitCount )
 {
 	if (bitCount > 64) bitCount = 64;
 	if (bitCount == 64)
@@ -255,7 +255,7 @@ void BitBlockTransfer(const void* _source, int sourceBitOffset, void* _destinati
 			memcpy(&workingBuffer, destination, outBytes);
 
 			//use a mask to clear the bits in the working buffer that we will overwrite
-			ui64 mask = computeMask(dstShift, (byte)bitCount);
+			ui64 mask = ComputeMask(dstShift, (byte)bitCount);
 			workingBuffer &= ~mask;
 
 			//read bytes from source into a value buffer
